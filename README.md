@@ -72,16 +72,9 @@ Vehicle-NumberPlate-Detection-MATLAB-Arduino/
 |       `-- detection_indicator.ino
 |
 |-- sample/
-|   |-- synthetic_traffic_demo.mp4
-|   |-- reference_blue_car.mp4
-|   |-- reference_white_car.mp4
-|   |-- reference_dark_car.mp4
-|   `-- README.md
+|   `-- README.md                 # demo videos are generated locally
 |
 |-- results/
-|   |-- reference_blue_detection.png
-|   |-- reference_white_detection.png
-|   |-- reference_dark_detection.png
 |   |-- reference_validation.csv
 |   |-- reference_validation.md
 |   `-- README.md
@@ -119,11 +112,13 @@ Then run:
 main
 ```
 
-The default configuration uses the included generated video:
+The default configuration uses:
 
 ```matlab
-cfg.videoPath = "../sample/synthetic_traffic_demo.mp4";
+cfg.videoPath = "../sample/synthetic_traffic_demo.avi";
 ```
+
+If the file is missing, `main.m` generates the synthetic demo automatically.
 
 After processing, the program writes:
 
@@ -219,38 +214,26 @@ The original code is gone, so I cannot identify the exact old line that failed. 
 - **motion blur / angle:** character and rectangular edges disappear
 - **hard threshold tuning:** settings that work for one video fail on another
 
-See [`docs/failure_analysis.md`](docs/failure_analysis.md) for the full breakdown and the simple reference colour-threshold experiment.
+A fuller discussion is in [`docs/failure_analysis.md`](docs/failure_analysis.md).
 
-## Reference validation included in this repo
+## Synthetic colour test
 
-Because the original college video was not preserved, the repository includes generated reference clips for a blue, white and dark car. They are there to make the project reproducible and to demonstrate the colour problem without pretending they are original experimental footage.
+The project can generate blue, white and dark-car clips to deliberately stress the colour/brightness issue.
 
-The simple fixed-brightness reference experiment shows the expected failure mode:
+During reconstruction, a reference implementation of the same classical processing idea was used to check these generated cases. A deliberately naive fixed-brightness detector detected the synthetic blue/dark car but **missed the white car completely**, while foreground-based localization was much more stable across the three colours.
 
-- blue car: detected
-- dark car: detected
-- white car: missed by the dark-pixel threshold
+The reference artifacts are in [`results/reference_validation.md`](results/reference_validation.md). They are not presented as measurements from the lost original project or as MATLAB benchmark results.
 
-The reconstructed vehicle stage therefore avoids using that colour rule as its primary detector.
+## Limitations
 
-See [`results/reference_validation.md`](results/reference_validation.md) and the images in `results/`.
+- designed mainly for a stationary camera
+- moving pedestrians/shadows can become foreground objects
+- stationary cars can eventually merge into the background model
+- thresholds still require tuning for resolution and scene geometry
+- plate detection deteriorates with distance, glare, blur and strong perspective
+- OCR is not reliable on very small/unclear plate crops
+- this is not a production automatic-number-plate-recognition system
 
-## Status / honesty note
+## Project status
 
-This repository is a **reconstruction**, not the untouched 2nd-year source tree.
-
-The MATLAB code has been written as a complete runnable implementation, but this environment does not contain a MATLAB runtime, so I have not labelled the repository with a fake "tested on MATLAB R20xx" claim. `setup_check.m` is included so the actual MATLAB installation can be checked before running.
-
-The generated reference media and independent validation artifacts are included to document the intended behaviour and the old colour-sensitivity failure mode.
-
-## Possible next improvements
-
-This is intentionally kept close to the scope of an early undergraduate project. Natural extensions would be:
-
-- tracking vehicles between frames
-- replacing geometric plate localization with a trained detector
-- more reliable OCR
-- automatic parking-entry logging
-- live webcam input
-- servo-controlled gate prototype
-- ESP32/Wi-Fi logging if the project were extended into a real IoT system
+Reconstructed as an archive/portfolio version of an early undergraduate project. The objective is to preserve the real engineering idea, MATLAB workflow, electronics interface and the problems encountered, without inflating it into a system that was never built.
