@@ -1,0 +1,4 @@
+case,eligible_frames,vehicle_hits,plate_hits,vehicle_hit_rate,plate_hit_rate,naive_fixed_threshold_hit_rate
+blue,99,99,86,1.0,0.8686868686868687,1.0
+white,99,99,99,1.0,1.0,0.0
+dark,99,95,49,0.9595959595959596,0.494949494949495,1.0
